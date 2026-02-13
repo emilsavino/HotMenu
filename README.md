@@ -36,18 +36,23 @@ A lightweight macOS menu bar app that monitors thermal pressure and alerts you w
 
 ## Installation
 
-Since the app is not signed, Gatekeeper may block it on first launch. You can either download a pre-built version from Releases and remove the quarantine attribute, or build it locally with Xcode to sign it with your own certificate.
+### Homebrew (recommended)
 
-Sorry about the inconvenience! I may get an Apple Developer account in the future to sign the app properly.
+```bash
+brew tap angristan/tap
+brew install --cask macthrottle
+```
 
-### Option 1: Download from Releases
+### Download from Releases
+
+Since the app is not signed, Gatekeeper may block it on first launch. You can remove the quarantine attribute manually, or build it locally with Xcode to sign it with your own certificate.
 
 1. Download the latest `.dmg` from [Releases](https://github.com/angristan/MacThrottle/releases)
 2. Open it, and drag `MacThrottle.app` to your Applications folder
 3. Remove quarantine attribute: `xattr -r -d com.apple.quarantine /Applications/MacThrottle.app`
 4. Open the app
 
-### Option 2: Build Locally
+### Build Locally
 
 Building locally automatically signs the app with your development certificate, avoiding Gatekeeper issues.
 

@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/angristan/MacThrottle/compare/v1.7.3...v1.7.4) (2026-04-29)
+
+
+### Performance Improvements
+
+* cache working SMC temperature keys ([09dc797](https://github.com/angristan/MacThrottle/commit/09dc797ddb48e042ac18bedb577244c930cca490))
+
 ## [1.7.3](https://github.com/angristan/MacThrottle/compare/v1.7.2...v1.7.3) (2026-01-01)
 
 

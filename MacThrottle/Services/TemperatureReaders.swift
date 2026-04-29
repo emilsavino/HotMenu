@@ -56,6 +56,7 @@ struct TemperatureReading {
 
 final class SMCReader {
     nonisolated(unsafe) static let shared = SMCReader()
+    private static let temperatureKeyProbeRetryInterval: TimeInterval = 60
 
     private var conn: io_connect_t = 0
     private var isConnected = false
@@ -98,6 +99,13 @@ final class SMCReader {
 
     // Cached fan count (0 = not yet read, -1 = no fans)
     private var cachedFanCount: Int?
+    private var cachedTemperatureKeys: [String]?
+    private var lastTemperatureKeyProbe: Date?
+
+    private var allTemperatureKeys: [String] {
+        var seenKeys = Set<String>()
+        return (m1Keys + mProMaxKeys + m2Keys + m3Keys + m4Keys).filter { seenKeys.insert($0).inserted }
+    }
 
     private init() {
         connect()
@@ -129,18 +137,23 @@ final class SMCReader {
     func readCPUTemperature() -> TemperatureReading? {
         guard isConnected else { return nil }
 
-        var maxTemp: Double = 0
-        var maxKey: String = ""
-
-        let allKeys = m1Keys + mProMaxKeys + m2Keys + m3Keys + m4Keys
-        for key in allKeys {
-            if let temp = readTemperature(key: key), temp > maxTemp && temp < 150 {
-                maxTemp = temp
-                maxKey = key
+        if let cachedTemperatureKeys, !cachedTemperatureKeys.isEmpty {
+            if let reading = readTemperatureReading(from: cachedTemperatureKeys).reading {
+                return reading
             }
+
+            self.cachedTemperatureKeys = nil
         }
 
-        return maxTemp > 0 ? TemperatureReading(value: maxTemp, source: maxKey) : nil
+        if shouldSkipTemperatureKeyProbe {
+            return nil
+        }
+
+        let result = readTemperatureReading(from: allTemperatureKeys)
+        cachedTemperatureKeys = result.validKeys
+        lastTemperatureKeyProbe = Date()
+
+        return result.reading
     }
 
     /// Returns the average fan speed across all fans, or nil if no fans or reading failed
@@ -190,6 +203,35 @@ final class SMCReader {
         // Fan keys are like "F0Ac", "F1Mx", etc.
         let fullKey = "F\(fan)\(key)"
         return readFloat(key: fullKey)
+    }
+
+    private var shouldSkipTemperatureKeyProbe: Bool {
+        guard let cachedTemperatureKeys,
+              cachedTemperatureKeys.isEmpty,
+              let lastTemperatureKeyProbe else {
+            return false
+        }
+
+        return Date().timeIntervalSince(lastTemperatureKeyProbe) < Self.temperatureKeyProbeRetryInterval
+    }
+
+    private func readTemperatureReading(from keys: [String]) -> (reading: TemperatureReading?, validKeys: [String]) {
+        var maxTemp: Double = 0
+        var maxKey: String = ""
+        var validKeys: [String] = []
+
+        for key in keys {
+            guard let temp = readTemperature(key: key) else { continue }
+
+            validKeys.append(key)
+            if temp > maxTemp {
+                maxTemp = temp
+                maxKey = key
+            }
+        }
+
+        let reading = maxTemp > 0 ? TemperatureReading(value: maxTemp, source: maxKey) : nil
+        return (reading, validKeys)
     }
 
     private func readUInt8(key: String) -> UInt8? {

@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/angristan/MacThrottle/compare/v1.7.4...v1.8.0) (2026-05-02)
+
+
+### Features
+
+* add manual update check ([#29](https://github.com/angristan/MacThrottle/issues/29)) ([1a5e957](https://github.com/angristan/MacThrottle/commit/1a5e957e8ea263d8062770478bc596742e4a1440))
+
 ## [1.7.4](https://github.com/angristan/MacThrottle/compare/v1.7.3...v1.7.4) (2026-04-29)
 
 

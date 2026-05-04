@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/angristan/MacThrottle/compare/v1.8.0...v1.8.1) (2026-05-04)
+
+
+### Bug Fixes
+
+* restore release app signing ([#30](https://github.com/angristan/MacThrottle/issues/30)) ([4a2713e](https://github.com/angristan/MacThrottle/commit/4a2713e39fc0b96666ca5e39479ee576ee9e6207))
+
 # [1.8.0](https://github.com/angristan/MacThrottle/compare/v1.7.4...v1.8.0) (2026-05-02)
 
 

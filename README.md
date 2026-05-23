@@ -8,7 +8,6 @@ HotMenu is a fork of [MacThrottle](https://github.com/angristan/MacThrottle) by 
 
 A lightweight macOS menu bar app for monitoring thermal pressure, CPU temperature, and fan activity without requiring admin privileges.
 
-![screenshot](./assets/screenshot.png)
 
 ## Features
 

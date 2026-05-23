@@ -6,13 +6,13 @@ struct AboutView: View {
     var body: some View {
         VStack(spacing: 16) {
             if #available(macOS 26.0, *) {
-                Image(nsImage: NSImage(named: "AppIcon") ?? NSApp.applicationIconImage)
+                Image(nsImage: NSImage.image)
                     .resizable()
                     .frame(width: 128, height: 128)
                     .cornerRadius(24)
                     .glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 24))
             } else {
-                Image(nsImage: NSImage(named: "AppIcon") ?? NSApp.applicationIconImage)
+                Image(nsImage: NSImage.image)
                     .resizable()
                     .frame(width: 128, height: 128)
                     .cornerRadius(24)

@@ -15,6 +15,8 @@
 		A1000024229E8F1100000001 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000023229E8F1100000001 /* AboutView.swift */; };
 		A100002C229E8F1100000001 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */; };
 		A100002F229E8F1100000001 /* HotMenu.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1000030229E8F1100000001 /* HotMenu.icon */; };
+		A1000040229E8F1100000001 /* ResourceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000041229E8F1100000001 /* ResourceMonitor.swift */; };
+		A1000042229E8F1100000001 /* RingGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000043229E8F1100000001 /* RingGauge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		A100002A229E8F1100000001 /* HotMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HotMenu.entitlements; sourceTree = "<group>"; };
 		A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
 		A1000030229E8F1100000001 /* HotMenu.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = HotMenu.icon; sourceTree = "<group>"; };
+		A1000041229E8F1100000001 /* ResourceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceMonitor.swift; sourceTree = "<group>"; };
+		A1000043229E8F1100000001 /* RingGauge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingGauge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +81,7 @@
 			children = (
 				A100001F229E8F1100000001 /* MenuContentView.swift */,
 				A1000023229E8F1100000001 /* AboutView.swift */,
+				A1000043229E8F1100000001 /* RingGauge.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -87,6 +92,7 @@
 				A1000004229E8F1100000001 /* ThermalMonitor.swift */,
 				A1000018229E8F1100000001 /* TemperatureReaders.swift */,
 				A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */,
+				A1000041229E8F1100000001 /* ResourceMonitor.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -167,6 +173,8 @@
 				A1000003229E8F1100000001 /* ThermalMonitor.swift in Sources */,
 				A1000017229E8F1100000001 /* TemperatureReaders.swift in Sources */,
 				A100002C229E8F1100000001 /* LaunchAtLoginManager.swift in Sources */,
+				A1000040229E8F1100000001 /* ResourceMonitor.swift in Sources */,
+				A1000042229E8F1100000001 /* RingGauge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

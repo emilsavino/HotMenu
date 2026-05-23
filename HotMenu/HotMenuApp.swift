@@ -16,12 +16,14 @@ struct HotMenuApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let monitor = ThermalMonitor()
+    private let resources = ResourceMonitor()
     private var statusBarController: StatusBarController?
     private var aboutWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusBarController = StatusBarController(
             monitor: monitor,
+            resources: resources,
             openAboutAction: { [weak self] in
                 self?.showAboutWindow()
             }
@@ -54,6 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 @MainActor
 private final class StatusBarController: NSObject {
     private let monitor: ThermalMonitor
+    private let resources: ResourceMonitor
     private let openAboutAction: () -> Void
     private let popover = NSPopover()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -70,6 +73,7 @@ private final class StatusBarController: NSObject {
     private lazy var hostingController = NSHostingController(
         rootView: MenuContentView(
             monitor: monitor,
+            resources: resources,
             openAboutAction: { [weak self] in
                 self?.popover.performClose(nil)
                 self?.openAboutAction()
@@ -77,8 +81,9 @@ private final class StatusBarController: NSObject {
         )
     )
 
-    init(monitor: ThermalMonitor, openAboutAction: @escaping () -> Void) {
+    init(monitor: ThermalMonitor, resources: ResourceMonitor, openAboutAction: @escaping () -> Void) {
         self.monitor = monitor
+        self.resources = resources
         self.openAboutAction = openAboutAction
         super.init()
         configureStatusItem()

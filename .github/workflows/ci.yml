@@ -50,65 +50,11 @@ jobs:
 
       - name: Build
         run: |
-          xcodebuild -project MacThrottle.xcodeproj \
-            -scheme MacThrottle \
+          xcodebuild -project HotMenu.xcodeproj \
+            -scheme HotMenu \
             -configuration Release \
             -derivedDataPath build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             build
-
-  release:
-    name: Release
-    runs-on: macos-26
-    needs: [commitlint, lint, build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    outputs:
-      new_release_version: ${{ steps.check.outputs.version }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v6
-        with:
-          node-version: lts/*
-      - name: Get latest tag before release
-        id: before
-        run: echo "tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> "$GITHUB_OUTPUT"
-      - name: Install dependencies
-        run: npm install -D semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/exec
-      - name: Install create-dmg
-        run: brew install create-dmg
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
-      - name: Check if a new release was created
-        id: check
-        run: |
-          git fetch --tags
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo '')
-          if [ "$LATEST_TAG" != "${{ steps.before.outputs.tag }}" ] && [ -n "$LATEST_TAG" ]; then
-            echo "version=${LATEST_TAG#v}" >> "$GITHUB_OUTPUT"
-          fi
-
-  update-homebrew:
-    name: Update Homebrew cask
-    needs: [release]
-    if: needs.release.outputs.new_release_version != ''
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify homebrew-tap
-        env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-        run: |
-          gh api repos/angristan/homebrew-tap/dispatches \
-            -f event_type=update-formula \
-            -f "client_payload[formula]=macthrottle" \
-            -f "client_payload[version]=${{ needs.release.outputs.new_release_version }}"

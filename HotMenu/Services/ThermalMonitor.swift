@@ -42,11 +42,11 @@ final class ThermalMonitor {
 
     // Menu bar settings
     // swiftlint:disable:next line_length
-    var showTemperatureInMenuBar: Bool = UserDefaults.standard.object(forKey: "showTemperatureInMenuBar") as? Bool ?? false {
+    var showTemperatureInMenuBar: Bool = UserDefaults.standard.object(forKey: "showTemperatureInMenuBar") as? Bool ?? true {
         didSet { UserDefaults.standard.set(showTemperatureInMenuBar, forKey: "showTemperatureInMenuBar") }
     }
 
-    var showFanSpeedInMenuBar: Bool = UserDefaults.standard.object(forKey: "showFanSpeedInMenuBar") as? Bool ?? false {
+    var showFanSpeedInMenuBar: Bool = UserDefaults.standard.object(forKey: "showFanSpeedInMenuBar") as? Bool ?? true {
         didSet { UserDefaults.standard.set(showFanSpeedInMenuBar, forKey: "showFanSpeedInMenuBar") }
     }
 

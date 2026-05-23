@@ -58,6 +58,15 @@ private final class StatusBarController: NSObject {
     private let popover = NSPopover()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let labelView = StatusBarLabelView()
+    private let fallbackIcon: NSImage? = {
+        let image = NSImage(systemSymbolName: "flame", accessibilityDescription: "HotMenu")
+        let configured = image?.withSymbolConfiguration(
+            NSImage.SymbolConfiguration(pointSize: 12, weight: .semibold)
+        )
+        let result = configured ?? image
+        result?.isTemplate = true
+        return result
+    }()
     private lazy var hostingController = NSHostingController(
         rootView: MenuContentView(
             monitor: monitor,
@@ -123,11 +132,24 @@ private final class StatusBarController: NSObject {
     }
 
     private func updateStatusItem() {
+        let temperature = monitor.showTemperatureInMenuBar ? monitor.temperature : nil
+        let fanSpeed = monitor.showFanSpeedInMenuBar ? monitor.fanSpeed : nil
+
         labelView.update(
-            temperature: monitor.showTemperatureInMenuBar ? monitor.temperature : nil,
-            fanSpeed: monitor.showFanSpeedInMenuBar ? monitor.fanSpeed : nil
+            temperature: temperature,
+            fanSpeed: fanSpeed
         )
-        statusItem.length = max(labelView.intrinsicContentSize.width, 8)
+
+        let isMenuBarContentEmpty = temperature == nil && fanSpeed == nil
+
+        if let button = statusItem.button {
+            labelView.isHidden = isMenuBarContentEmpty
+            button.image = isMenuBarContentEmpty ? fallbackIcon : nil
+        }
+
+        statusItem.length = isMenuBarContentEmpty
+            ? NSStatusItem.squareLength
+            : max(labelView.intrinsicContentSize.width, 8)
         updatePopoverSize()
     }
 

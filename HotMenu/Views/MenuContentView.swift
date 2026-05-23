@@ -17,34 +17,24 @@ struct MenuContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Thermal Pressure:")
-                Text(monitor.pressure.displayName)
-                    .foregroundColor(monitor.pressure.color)
-                    .fontWeight(.semibold)
-                Spacer()
                 if let temp = monitor.temperature {
                     Text("\(Int(temp.rounded()))°C")
                         .foregroundColor(colorForTemperature(temp))
                         .fontWeight(.semibold)
                         .help("Source: \(monitor.temperatureSource ?? "Unknown")")
+                } else {
+                    Text("—°C")
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                if let fan = monitor.fanSpeed {
+                    Text("\(Int(fan.rounded())) RPM")
+                        .fontWeight(.semibold)
                 }
             }
             .font(.headline)
-
-            if monitor.history.count >= 2 {
-                HistoryGraphView(history: monitor.history, showFanSpeed: monitor.showFanSpeed)
-            }
-
-            if !monitor.timeInEachState.isEmpty {
-                Divider()
-                Text("Statistics")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TimeBreakdownView(
-                    timeInEachState: monitor.timeInEachState,
-                    totalDuration: monitor.totalHistoryDuration
-                )
-            }
 
             Divider()
 
@@ -58,11 +48,6 @@ struct MenuContentView: View {
             ))
             .controlSize(.small)
 
-            if monitor.hasFans {
-                Toggle("Show Fan Speed", isOn: $monitor.showFanSpeed)
-                    .controlSize(.small)
-            }
-
             Toggle("Show Temperature in Menu Bar", isOn: $monitor.showTemperatureInMenuBar)
                 .controlSize(.small)
 
@@ -70,20 +55,6 @@ struct MenuContentView: View {
                 Toggle("Show Fan Speed in Menu Bar", isOn: $monitor.showFanSpeedInMenuBar)
                     .controlSize(.small)
             }
-
-            Divider()
-
-            Text("Notifications")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Group {
-                Toggle("On Heavy", isOn: $monitor.notifyOnHeavy)
-                Toggle("On Critical", isOn: $monitor.notifyOnCritical)
-                Toggle("On Recovery", isOn: $monitor.notifyOnRecovery)
-                Toggle("Sound", isOn: $monitor.notificationSound)
-            }
-            .controlSize(.small)
 
             Divider()
 

@@ -11,13 +11,9 @@
 		A1000003229E8F1100000001 /* ThermalMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004229E8F1100000001 /* ThermalMonitor.swift */; };
 		A1000015229E8F1100000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000016229E8F1100000001 /* Assets.xcassets */; };
 		A1000017229E8F1100000001 /* TemperatureReaders.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000018229E8F1100000001 /* TemperatureReaders.swift */; };
-		A1000019229E8F1100000001 /* HistoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001A229E8F1100000001 /* HistoryViews.swift */; };
-		A100001C229E8F1100000001 /* ThermalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001B229E8F1100000001 /* ThermalModels.swift */; };
 		A1000020229E8F1100000001 /* MenuContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100001F229E8F1100000001 /* MenuContentView.swift */; };
 		A1000024229E8F1100000001 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000023229E8F1100000001 /* AboutView.swift */; };
-		A1000029229E8F1100000001 /* ThermalPressureReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000028229E8F1100000001 /* ThermalPressureReader.swift */; };
 		A100002C229E8F1100000001 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */; };
-		A100002E229E8F1100000001 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100002D229E8F1100000001 /* UpdateChecker.swift */; };
 		A100002F229E8F1100000001 /* HotMenu.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1000030229E8F1100000001 /* HotMenu.icon */; };
 /* End PBXBuildFile section */
 
@@ -28,14 +24,10 @@
 		A1000006229E8F1100000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000016229E8F1100000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000018229E8F1100000001 /* TemperatureReaders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemperatureReaders.swift; sourceTree = "<group>"; };
-		A100001A229E8F1100000001 /* HistoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViews.swift; sourceTree = "<group>"; };
-		A100001B229E8F1100000001 /* ThermalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermalModels.swift; sourceTree = "<group>"; };
 		A100001F229E8F1100000001 /* MenuContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuContentView.swift; sourceTree = "<group>"; };
 		A1000023229E8F1100000001 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
-		A1000028229E8F1100000001 /* ThermalPressureReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermalPressureReader.swift; sourceTree = "<group>"; };
 		A100002A229E8F1100000001 /* HotMenu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HotMenu.entitlements; sourceTree = "<group>"; };
 		A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
-		A100002D229E8F1100000001 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		A1000030229E8F1100000001 /* HotMenu.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = HotMenu.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -62,7 +54,6 @@
 			isa = PBXGroup;
 			children = (
 				A1000002229E8F1100000001 /* HotMenuApp.swift */,
-				A1000025229E8F1100000001 /* Models */,
 				A1000026229E8F1100000001 /* Views */,
 				A1000027229E8F1100000001 /* Services */,
 				A1000016229E8F1100000001 /* Assets.xcassets */,
@@ -81,20 +72,11 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A1000025229E8F1100000001 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				A100001B229E8F1100000001 /* ThermalModels.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
 		A1000026229E8F1100000001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
 				A100001F229E8F1100000001 /* MenuContentView.swift */,
 				A1000023229E8F1100000001 /* AboutView.swift */,
-				A100001A229E8F1100000001 /* HistoryViews.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -103,10 +85,8 @@
 			isa = PBXGroup;
 			children = (
 				A1000004229E8F1100000001 /* ThermalMonitor.swift */,
-				A1000028229E8F1100000001 /* ThermalPressureReader.swift */,
 				A1000018229E8F1100000001 /* TemperatureReaders.swift */,
 				A100002B229E8F1100000001 /* LaunchAtLoginManager.swift */,
-				A100002D229E8F1100000001 /* UpdateChecker.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -182,15 +162,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000001229E8F1100000001 /* HotMenuApp.swift in Sources */,
-				A100001C229E8F1100000001 /* ThermalModels.swift in Sources */,
 				A1000020229E8F1100000001 /* MenuContentView.swift in Sources */,
 				A1000024229E8F1100000001 /* AboutView.swift in Sources */,
-				A1000019229E8F1100000001 /* HistoryViews.swift in Sources */,
 				A1000003229E8F1100000001 /* ThermalMonitor.swift in Sources */,
-				A1000029229E8F1100000001 /* ThermalPressureReader.swift in Sources */,
 				A1000017229E8F1100000001 /* TemperatureReaders.swift in Sources */,
 				A100002C229E8F1100000001 /* LaunchAtLoginManager.swift in Sources */,
-				A100002E229E8F1100000001 /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

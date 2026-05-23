@@ -16,22 +16,36 @@ struct RingGauge: View {
 
     var body: some View {
         ZStack {
-            Circle()
-                .stroke(
-                    Color.secondary.opacity(Self.trackOpacity),
-                    style: StrokeStyle(lineWidth: Self.stroke, lineCap: .round)
-                )
-
-            Circle()
-                .trim(from: 0, to: fraction)
-                .stroke(color, style: StrokeStyle(lineWidth: Self.stroke, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.4), value: fraction)
-
-            Image(systemName: symbolName)
-                .font(.system(size: Self.symbolSize, weight: .regular))
-                .foregroundStyle(.primary)
+            track
+            filledArc
+            symbol
         }
         .frame(width: Self.diameter, height: Self.diameter)
     }
+
+    private var track: some View {
+        Circle()
+            .stroke(
+                Color.secondary.opacity(Self.trackOpacity),
+                style: StrokeStyle(lineWidth: Self.stroke, lineCap: .round)
+            )
+    }
+
+    private var filledArc: some View {
+        Circle()
+            .trim(from: 0, to: fraction)
+            .stroke(color, style: StrokeStyle(lineWidth: Self.stroke, lineCap: .round))
+            .rotationEffect(.degrees(-90))
+            .animation(.easeInOut(duration: 0.4), value: fraction)
+    }
+
+    private var symbol: some View {
+        Image(systemName: symbolName)
+            .font(.system(size: Self.symbolSize, weight: .regular))
+            .foregroundStyle(.primary)
+    }
+}
+
+#Preview {
+    RingGauge(percent: 30, symbolName: "memorychip", color: .green)
 }

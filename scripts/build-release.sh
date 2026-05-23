@@ -10,11 +10,14 @@ fi
 
 echo "Building HotMenu v$VERSION"
 
-# Clean and build
+# Clean and build (unsigned)
 xcodebuild -project HotMenu.xcodeproj \
     -scheme HotMenu \
     -configuration Release \
     -derivedDataPath build \
+    CODE_SIGN_IDENTITY="" \
+    CODE_SIGNING_REQUIRED=NO \
+    CODE_SIGNING_ALLOWED=NO \
     clean build
 
 # Create release directory

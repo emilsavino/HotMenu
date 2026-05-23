@@ -3,7 +3,7 @@ import Observation
 import SwiftUI
 
 @main
-struct MacThrottleApp: App {
+struct HotMenuApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
@@ -40,7 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.contentViewController = hostingController
             window.isReleasedWhenClosed = false
             window.center()
-            window.title = "About MacThrottle"
+            window.title = "About HotMenu"
             window.titleVisibility = .hidden
             window.titlebarAppearsTransparent = true
             aboutWindow = window

@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A100000B229E8F1100000001"
-               BuildableName = "MacThrottle.app"
-               BlueprintName = "MacThrottle"
-               ReferencedContainer = "container:MacThrottle.xcodeproj">
+               BuildableName = "HotMenu.app"
+               BlueprintName = "HotMenu"
+               ReferencedContainer = "container:HotMenu.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A100000B229E8F1100000001"
-            BuildableName = "MacThrottle.app"
-            BlueprintName = "MacThrottle"
-            ReferencedContainer = "container:MacThrottle.xcodeproj">
+            BuildableName = "HotMenu.app"
+            BlueprintName = "HotMenu"
+            ReferencedContainer = "container:HotMenu.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -62,9 +62,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A100000B229E8F1100000001"
-            BuildableName = "MacThrottle.app"
-            BlueprintName = "MacThrottle"
-            ReferencedContainer = "container:MacThrottle.xcodeproj">
+            BuildableName = "HotMenu.app"
+            BlueprintName = "HotMenu"
+            ReferencedContainer = "container:HotMenu.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

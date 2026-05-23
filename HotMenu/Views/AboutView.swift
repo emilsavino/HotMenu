@@ -18,7 +18,7 @@ struct AboutView: View {
                     .cornerRadius(24)
             }
 
-            Text("MacThrottle")
+            Text("HotMenu")
                 .font(.title)
                 .fontWeight(.bold)
 
@@ -33,7 +33,7 @@ struct AboutView: View {
 
             updateSection
 
-            if let url = URL(string: "https://github.com/angristan/MacThrottle") {
+            if let url = URL(string: "https://github.com/emilsavino/HotMenu") {
                 if #available(macOS 26.0, *) {
                     Link("View on GitHub", destination: url)
                         .font(.caption)

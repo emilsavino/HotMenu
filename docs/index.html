@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HotMenu — macOS menu bar app for CPU temperature, fan speed, and system load</title>
+    <meta name="description" content="HotMenu is a tiny macOS menu bar app that shows live CPU temperature, fan speed, CPU load and memory usage.">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #fafafa;
+            --fg: #1a1a1a;
+            --muted: #5a5a5a;
+            --accent: #d94318;
+            --card: #ffffff;
+            --border: rgba(0, 0, 0, 0.08);
+            --code-bg: #f0f0f0;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #161616;
+                --fg: #f0f0f0;
+                --muted: #a0a0a0;
+                --accent: #ff6b3d;
+                --card: #1f1f1f;
+                --border: rgba(255, 255, 255, 0.1);
+                --code-bg: #2a2a2a;
+            }
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+        }
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 56px 24px 80px;
+        }
+        header { text-align: center; margin-bottom: 40px; }
+        h1 {
+            font-size: 2.6rem;
+            margin: 0 0 8px;
+            letter-spacing: -0.02em;
+        }
+        .tagline { color: var(--muted); font-size: 1.1rem; margin: 0; }
+        h2 {
+            font-size: 1.25rem;
+            margin: 0 0 12px;
+            letter-spacing: -0.01em;
+        }
+        section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+        .download-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        a.button {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            transition: opacity 0.15s ease;
+        }
+        a.button:hover { opacity: 0.88; }
+        a.secondary {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        a.secondary:hover { text-decoration: underline; }
+        .version {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        ol { padding-left: 22px; margin: 0; }
+        ol li { margin-bottom: 10px; }
+        ol li:last-child { margin-bottom: 0; }
+        code, pre {
+            font-family: "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.9rem;
+        }
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        pre {
+            background: var(--code-bg);
+            padding: 12px 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0 0;
+        }
+        pre code { background: none; padding: 0; }
+        footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 40px;
+        }
+        footer a { color: var(--muted); }
+        .note {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <h1>HotMenu</h1>
+        <p class="tagline">A tiny macOS menu bar app for CPU temperature, fan speed, CPU load and memory usage.</p>
+    </header>
+
+    <section>
+        <h2>Download</h2>
+        <div class="download-row">
+            <a id="dmg" class="button" href="https://github.com/emilsavino/HotMenu/releases/latest">Download for macOS (.dmg)</a>
+            <a id="zip" class="secondary" href="https://github.com/emilsavino/HotMenu/releases/latest">or .zip</a>
+        </div>
+        <p class="version">Latest version: <span id="version">latest</span> · macOS 15 or newer · Apple Silicon</p>
+    </section>
+
+    <section>
+        <h2>How to install</h2>
+        <p>HotMenu isn't signed by Apple (which costs $99 a year), so macOS will block it the first time you try to open it. You only have to do this once.</p>
+        <ol>
+            <li>Download the <strong>.dmg</strong> above and open it.</li>
+            <li>Drag <strong>HotMenu</strong> into the <strong>Applications</strong> folder.</li>
+            <li>Open the <strong>Terminal</strong> app (press <code>⌘ Space</code>, type "Terminal", press Return).</li>
+            <li>
+                Paste this command and press Return:
+                <pre><code>xattr -r -d com.apple.quarantine /Applications/HotMenu.app</code></pre>
+            </li>
+            <li>Open HotMenu from your Applications folder. A small flame icon will appear in your menu bar.</li>
+        </ol>
+        <p class="note">If you skip step 4, macOS will say <em>"HotMenu can't be opened because Apple cannot check it for malicious software."</em> The command above tells macOS that you trust this app.</p>
+    </section>
+
+    <section>
+        <h2>What it shows</h2>
+        <ul>
+            <li>CPU temperature in the menu bar</li>
+            <li>Fan speed (on Macs that have fans)</li>
+            <li>CPU usage and memory usage when you click the menu bar icon</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>Source code on <a href="https://github.com/emilsavino/HotMenu">GitHub</a>. Forked from <a href="https://github.com/angristan/MacThrottle">MacThrottle</a>.</p>
+    </footer>
+</main>
+
+<script>
+(function () {
+    fetch('https://api.github.com/repos/emilsavino/HotMenu/releases/latest', {
+        headers: { Accept: 'application/vnd.github+json' }
+    })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (release) {
+        if (!release) return;
+        var dmg = (release.assets || []).find(function (a) { return a.name.endsWith('.dmg'); });
+        var zip = (release.assets || []).find(function (a) { return a.name.endsWith('.zip'); });
+        if (dmg) document.getElementById('dmg').href = dmg.browser_download_url;
+        if (zip) document.getElementById('zip').href = zip.browser_download_url;
+        if (release.tag_name) document.getElementById('version').textContent = release.tag_name;
+    })
+    .catch(function () { /* fall back to the /releases/latest links already set */ });
+})();
+</script>
+</body>
+</html>

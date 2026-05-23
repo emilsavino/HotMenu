@@ -55,6 +55,12 @@ struct HistoryGraphView: View {
         showFanSpeed && downsampledHistory.contains { $0.fanSpeed != nil }
     }
 
+    private var fanSpeedRange: (min: Double, max: Double) {
+        let speeds = downsampledHistory.compactMap(\.fanSpeed)
+        guard let maxSpeed = speeds.max(), maxSpeed > 0 else { return (0, 1_000) }
+        return (0, max(1_000, ceil(maxSpeed / 500) * 500))
+    }
+
     private func yPositionForTemperature(_ temp: Double, height: CGFloat) -> CGFloat {
         let range = temperatureRange
         let padding: CGFloat = 4
@@ -62,9 +68,10 @@ struct HistoryGraphView: View {
         return padding + (1.0 - CGFloat(normalized)) * (height - padding * 2)
     }
 
-    private func yPositionForFanSpeed(_ percentage: Double, height: CGFloat) -> CGFloat {
+    private func yPositionForFanSpeed(_ rpm: Double, height: CGFloat) -> CGFloat {
+        let range = fanSpeedRange
         let padding: CGFloat = 4
-        let normalized = percentage / 100.0
+        let normalized = rpm / range.max
         return padding + (1.0 - CGFloat(normalized)) * (height - padding * 2)
     }
 
@@ -221,8 +228,9 @@ struct HistoryGraphView: View {
 
             // Fan speed range labels (right side)
             if hasFanData {
-                let fanMaxLabel = Text("100%").font(labelStyle).foregroundColor(fanColor.opacity(0.8))
-                let fanMinLabel = Text("0%").font(labelStyle).foregroundColor(fanColor.opacity(0.8))
+                let fanRange = fanSpeedRange
+                let fanMaxLabel = Text("\(Int(fanRange.max))").font(labelStyle).foregroundColor(fanColor.opacity(0.8))
+                let fanMinLabel = Text("0 RPM").font(labelStyle).foregroundColor(fanColor.opacity(0.8))
                 context.draw(fanMaxLabel, at: CGPoint(x: size.width - 4, y: 4), anchor: .topTrailing)
                 context.draw(fanMinLabel, at: CGPoint(x: size.width - 4, y: size.height - 4), anchor: .bottomTrailing)
             }
@@ -275,7 +283,7 @@ struct HistoryGraphView: View {
             if let temp = entry.temperature {
                 let timeAgo = Int(Date().timeIntervalSince(entry.timestamp))
                 let timeStr = timeAgo < 60 ? "\(timeAgo)s ago" : "\(timeAgo / 60)m ago"
-                let fanStr = showFanSpeed ? entry.fanSpeed.map { " • Fan \(Int($0))%" } ?? "" : ""
+                let fanStr = showFanSpeed ? entry.fanSpeed.map { " • Fan \(Int($0)) RPM" } ?? "" : ""
                 if #available(macOS 26.0, *) {
                     Text("\(Int(temp))° • \(entry.pressure.displayName)\(fanStr) • \(timeStr)")
                         .font(.system(size: 8, weight: .medium))

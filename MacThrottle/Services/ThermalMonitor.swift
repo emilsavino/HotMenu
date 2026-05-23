@@ -12,7 +12,7 @@ final class ThermalMonitor {
     private(set) var pressure: ThermalPressure = .unknown
     private(set) var temperature: Double?
     private(set) var temperatureSource: String?  // SMC key or "HID"
-    private(set) var fanSpeed: Double?  // Percentage 0-100%
+    private(set) var fanSpeed: Double?  // Average RPM across available fans
     private(set) var hasFans: Bool = false
     private(set) var history: [HistoryEntry] = []
     private var timer: Timer?
@@ -44,6 +44,10 @@ final class ThermalMonitor {
     // swiftlint:disable:next line_length
     var showTemperatureInMenuBar: Bool = UserDefaults.standard.object(forKey: "showTemperatureInMenuBar") as? Bool ?? false {
         didSet { UserDefaults.standard.set(showTemperatureInMenuBar, forKey: "showTemperatureInMenuBar") }
+    }
+
+    var showFanSpeedInMenuBar: Bool = UserDefaults.standard.object(forKey: "showFanSpeedInMenuBar") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(showFanSpeedInMenuBar, forKey: "showFanSpeedInMenuBar") }
     }
 
     var timeInEachState: [(pressure: ThermalPressure, duration: TimeInterval)] {
@@ -126,7 +130,7 @@ final class ThermalMonitor {
 
         // Read fan speed
         if let fan = SMCReader.shared.readFanSpeed() {
-            fanSpeed = fan.percentage
+            fanSpeed = fan.rpm
             if !hasFans { hasFans = true }
         }
 

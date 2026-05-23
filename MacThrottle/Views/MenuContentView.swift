@@ -12,6 +12,7 @@ func colorForTemperature(_ temp: Double) -> Color {
 struct MenuContentView: View {
     @Bindable var monitor: ThermalMonitor
     @Environment(\.openWindow) private var openWindow
+    var openAboutAction: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -65,6 +66,11 @@ struct MenuContentView: View {
             Toggle("Show Temperature in Menu Bar", isOn: $monitor.showTemperatureInMenuBar)
                 .controlSize(.small)
 
+            if monitor.hasFans {
+                Toggle("Show Fan Speed in Menu Bar", isOn: $monitor.showFanSpeedInMenuBar)
+                    .controlSize(.small)
+            }
+
             Divider()
 
             Text("Notifications")
@@ -101,7 +107,11 @@ struct MenuContentView: View {
     }
 
     private func openAboutWindow() {
-        openWindow(id: "about")
+        if let openAboutAction {
+            openAboutAction()
+        } else {
+            openWindow(id: "about")
+        }
         NSApp.activate(ignoringOtherApps: true)
     }
 }

@@ -41,6 +41,6 @@ enum ThermalPressure: String, Codable {
 struct HistoryEntry {
     let pressure: ThermalPressure
     let temperature: Double?
-    let fanSpeed: Double?  // Percentage 0-100%
+    let fanSpeed: Double?  // Average RPM across available fans
     let timestamp: Date
 }

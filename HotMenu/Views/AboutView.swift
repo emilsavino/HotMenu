@@ -37,5 +37,10 @@ struct AboutView: View {
             .font(.body)
             .multilineTextAlignment(.center)
             .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
+}
+
+#Preview {
+    AboutView()
 }

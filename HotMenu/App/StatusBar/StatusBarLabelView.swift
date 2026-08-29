@@ -4,7 +4,8 @@ final class StatusBarLabelView: NSView {
     private static let horizontalPadding: CGFloat = 4
     private static let lineSpacing: CGFloat = -1
     private static let temperatureFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
-    private static let fanFont = NSFont.monospacedDigitSystemFont(ofSize: 8, weight: .semibold)
+    private static let standaloneTemperatureFont = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .bold)
+    private static let fanFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
 
     private var temperature: Double?
     private var fanSpeed: Double?
@@ -51,7 +52,7 @@ final class StatusBarLabelView: NSView {
                 NSAttributedString(
                     string: "\(Int(temperature.rounded()))°",
                     attributes: [
-                        .font: Self.temperatureFont,
+                        .font: fanSpeed == nil ? Self.standaloneTemperatureFont : Self.temperatureFont,
                         .foregroundColor: NSColor.labelColor
                     ]
                 )
@@ -80,7 +81,7 @@ final class StatusBarLabelView: NSView {
 final class StatusBarMetricView: NSView {
     private static let horizontalPadding: CGFloat = 4
     private static let lineSpacing: CGFloat = -1
-    private static let labelFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .medium)
+    private static let labelFont = NSFont.monospacedSystemFont(ofSize: 10, weight: .semibold)
     private static let valueFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
     // Keep normal values stable at two digits; 100% can expand as an exception.
     private static let maximumValueWidth: CGFloat = ["99%", "—%"]

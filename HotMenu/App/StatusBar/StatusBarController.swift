@@ -42,9 +42,21 @@ final class StatusBarController: NSObject {
         self.openAboutAction = openAboutAction
         super.init()
         configureThermalStatusItem()
-        configureResourceStatusItem(cpuStatusItem, labelView: cpuLabelView)
-        configureResourceStatusItem(gpuStatusItem, labelView: gpuLabelView)
-        configureResourceStatusItem(memoryStatusItem, labelView: memoryLabelView)
+        configureResourceStatusItem(
+            cpuStatusItem,
+            labelView: cpuLabelView,
+            accessibilityLabel: "CPU usage"
+        )
+        configureResourceStatusItem(
+            gpuStatusItem,
+            labelView: gpuLabelView,
+            accessibilityLabel: "GPU usage"
+        )
+        configureResourceStatusItem(
+            memoryStatusItem,
+            labelView: memoryLabelView,
+            accessibilityLabel: "Memory usage"
+        )
         configurePopover()
         startObservingState()
         updateStatusItems()
@@ -57,6 +69,7 @@ final class StatusBarController: NSObject {
         button.image = nil
         button.target = self
         button.action = #selector(togglePopover(_:))
+        configureAccessibility(for: button, label: "CPU temperature and fan speed")
 
         labelView.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(labelView)
@@ -68,13 +81,18 @@ final class StatusBarController: NSObject {
         ])
     }
 
-    private func configureResourceStatusItem(_ statusItem: NSStatusItem, labelView: StatusBarMetricView) {
+    private func configureResourceStatusItem(
+        _ statusItem: NSStatusItem,
+        labelView: StatusBarMetricView,
+        accessibilityLabel: String
+    ) {
         guard let button = statusItem.button else { return }
 
         button.title = ""
         button.image = nil
         button.target = self
         button.action = #selector(togglePopover(_:))
+        configureAccessibility(for: button, label: accessibilityLabel)
 
         labelView.translatesAutoresizingMaskIntoConstraints = false
         button.addSubview(labelView)
@@ -86,6 +104,13 @@ final class StatusBarController: NSObject {
         ])
 
         statusItem.isVisible = false
+    }
+
+    private func configureAccessibility(for button: NSButton, label: String) {
+        button.toolTip = label
+        button.setAccessibilityElement(true)
+        button.setAccessibilityRole(.button)
+        button.setAccessibilityLabel(label)
     }
 
     private func configurePopover() {
@@ -123,7 +148,9 @@ final class StatusBarController: NSObject {
     private func updateStatusItems() {
         updateThermalStatusItem()
         updateResourceStatusItems()
-        updatePopoverSize()
+        if popover.isShown {
+            updatePopoverSize()
+        }
     }
 
     private func updateThermalStatusItem() {
@@ -140,6 +167,7 @@ final class StatusBarController: NSObject {
         if let button = thermalStatusItem.button {
             labelView.isHidden = isMenuBarContentEmpty
             button.image = isMenuBarContentEmpty ? fallbackIcon : nil
+            button.setAccessibilityValue(thermalAccessibilityValue)
         }
 
         thermalStatusItem.length = isMenuBarContentEmpty
@@ -175,8 +203,22 @@ final class StatusBarController: NSObject {
         value: String
     ) {
         labelView.update(value: value)
+        statusItem.button?.setAccessibilityValue(value)
         statusItem.length = max(labelView.intrinsicContentSize.width, 8)
         statusItem.isVisible = isVisible
+    }
+
+    private var thermalAccessibilityValue: String {
+        var values: [String] = []
+
+        if monitor.showTemperatureInMenuBar, let temperature = monitor.temperature {
+            values.append("\(Int(temperature.rounded())) degrees")
+        }
+        if monitor.showFanSpeedInMenuBar, let fanSpeed = monitor.fanSpeed {
+            values.append("\(Int(fanSpeed.rounded())) RPM")
+        }
+
+        return values.isEmpty ? "Unavailable" : values.joined(separator: ", ")
     }
 
     private func percentText(_ percent: Double?) -> String {

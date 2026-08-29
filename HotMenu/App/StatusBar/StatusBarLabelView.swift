@@ -82,7 +82,8 @@ final class StatusBarMetricView: NSView {
     private static let lineSpacing: CGFloat = -1
     private static let labelFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .medium)
     private static let valueFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
-    private static let maximumValueWidth: CGFloat = ["100%", "—%"]
+    // Keep normal values stable at two digits; 100% can expand as an exception.
+    private static let maximumValueWidth: CGFloat = ["99%", "—%"]
         .map { NSAttributedString(string: $0, attributes: [.font: valueFont]).size().width }
         .max() ?? 0
 
@@ -105,8 +106,12 @@ final class StatusBarMetricView: NSView {
             string: label,
             attributes: [.font: Self.labelFont]
         ).size().width
+        let valueWidth = NSAttributedString(
+            string: value,
+            attributes: [.font: Self.valueFont]
+        ).size().width
         return NSSize(
-            width: max(labelWidth, Self.maximumValueWidth) + Self.horizontalPadding * 2,
+            width: max(labelWidth, max(Self.maximumValueWidth, valueWidth)) + Self.horizontalPadding * 2,
             height: NSStatusBar.system.thickness
         )
     }

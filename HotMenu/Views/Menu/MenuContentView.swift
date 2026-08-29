@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuContentView: View {
     @Bindable var monitor: ThermalMonitor
-    var resources: ResourceMonitor
+    @Bindable var resources: ResourceMonitor
     @Environment(\.openWindow) private var openWindow
     var openAboutAction: (() -> Void)?
 
@@ -19,6 +19,14 @@ struct MenuContentView: View {
                 criticalThreshold: 85
             )
             ResourceRow(
+                label: "GPU",
+                symbolName: "square.stack.3d.up",
+                percent: resources.gpuUsage,
+                trailing: nil,
+                warningThreshold: 70,
+                criticalThreshold: 85
+            )
+            ResourceRow(
                 label: "Memory",
                 symbolName: "memorychip",
                 percent: memoryPercent,
@@ -27,7 +35,7 @@ struct MenuContentView: View {
                 criticalThreshold: 90
             )
             Divider()
-            SettingsSection(monitor: monitor)
+            SettingsSection(monitor: monitor, resources: resources)
             Divider()
             MenuActionsRow(openAboutAction: openAboutWindow)
         }

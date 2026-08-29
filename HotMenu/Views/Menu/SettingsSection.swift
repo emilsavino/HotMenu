@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsSection: View {
     @Bindable var monitor: ThermalMonitor
+    @Bindable var resources: ResourceMonitor
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -9,6 +10,9 @@ struct SettingsSection: View {
             launchAtLoginToggle
             temperatureToggle
             fanSpeedToggle
+            cpuToggle
+            gpuToggle
+            memoryToggle
         }
     }
 
@@ -37,5 +41,20 @@ struct SettingsSection: View {
             Toggle("Show Fan Speed in Menu Bar", isOn: $monitor.showFanSpeedInMenuBar)
                 .controlSize(.small)
         }
+    }
+
+    private var cpuToggle: some View {
+        Toggle("Show CPU in Menu Bar", isOn: $resources.showCPUInMenuBar)
+            .controlSize(.small)
+    }
+
+    private var gpuToggle: some View {
+        Toggle("Show GPU in Menu Bar", isOn: $resources.showGPUInMenuBar)
+            .controlSize(.small)
+    }
+
+    private var memoryToggle: some View {
+        Toggle("Show Memory in Menu Bar", isOn: $resources.showMemoryInMenuBar)
+            .controlSize(.small)
     }
 }

@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 @Observable
 final class ThermalMonitor {
     private static let pollIntervalSeconds: TimeInterval = 2.0
@@ -9,7 +10,7 @@ final class ThermalMonitor {
     private(set) var temperatureSource: String?
     private(set) var fanSpeed: Double?
     private(set) var hasFans: Bool = false
-    private var timer: Timer?
+    private nonisolated let samplingTaskHandle = SamplingTaskHandle()
 
     var showTemperatureInMenuBar: Bool = UserDefaults.standard.object(forKey: "showTemperatureInMenuBar") as? Bool ?? true {
         didSet { UserDefaults.standard.set(showTemperatureInMenuBar, forKey: "showTemperatureInMenuBar") }
@@ -24,32 +25,57 @@ final class ThermalMonitor {
     }
 
     deinit {
-        timer?.invalidate()
+        samplingTaskHandle.cancel()
     }
 
     private func startMonitoring() {
-        updateThermalState()
+        let sampler = ThermalSampler()
 
-        timer = Timer.scheduledTimer(withTimeInterval: Self.pollIntervalSeconds, repeats: true) { [weak self] _ in
-            self?.updateThermalState()
+        let task = Task { @MainActor [weak self, sampler] in
+            while !Task.isCancelled {
+                let snapshot = await sampler.sample()
+                guard !Task.isCancelled else { return }
+                guard self != nil else { return }
+                self?.apply(snapshot)
+
+                do {
+                    try await Task.sleep(nanoseconds: UInt64(Self.pollIntervalSeconds * 1_000_000_000))
+                } catch {
+                    // Task cancellation stops the sampling loop.
+                    return
+                }
+            }
         }
+
+        samplingTaskHandle.set(task)
     }
 
-    private func updateThermalState() {
-        if let smcReading = SMCReader.shared.readCPUTemperature() {
-            temperature = smcReading.value
-            temperatureSource = smcReading.source
-        } else if let hidReading = HIDTemperatureReader.shared.readCPUTemperature() {
-            temperature = hidReading.value
-            temperatureSource = hidReading.source
-        } else {
-            temperature = nil
-            temperatureSource = nil
-        }
+    private func apply(_ snapshot: ThermalSnapshot) {
+        temperature = snapshot.temperature
+        temperatureSource = snapshot.temperatureSource
 
-        if let fan = SMCReader.shared.readFanSpeed() {
-            fanSpeed = fan.rpm
-            if !hasFans { hasFans = true }
+        if let fanSpeed = snapshot.fanSpeed {
+            self.fanSpeed = fanSpeed
+            hasFans = true
         }
+    }
+}
+
+private struct ThermalSnapshot: Sendable {
+    let temperature: Double?
+    let temperatureSource: String?
+    let fanSpeed: Double?
+}
+
+private actor ThermalSampler {
+    func sample() -> ThermalSnapshot {
+        let temperatureReading = SMCReader.shared.readCPUTemperature()
+            ?? HIDTemperatureReader.shared.readCPUTemperature()
+
+        return ThermalSnapshot(
+            temperature: temperatureReading?.value,
+            temperatureSource: temperatureReading?.source,
+            fanSpeed: SMCReader.shared.readFanSpeed()?.rpm
+        )
     }
 }

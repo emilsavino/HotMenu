@@ -24,16 +24,20 @@ final class ResourceMonitor {
         didSet { UserDefaults.standard.set(showMemoryInMenuBar, forKey: "showMemoryInMenuBar") }
     }
 
-    private var samplingTask: Task<Void, Never>?
+    private nonisolated let samplingTaskHandle = SamplingTaskHandle()
 
     init() {
         start()
     }
 
+    deinit {
+        samplingTaskHandle.cancel()
+    }
+
     private func start() {
         let sampler = ResourceSampler()
 
-        samplingTask = Task { @MainActor [weak self, sampler] in
+        let task = Task { @MainActor [weak self, sampler] in
             let initialSnapshot = await sampler.sample()
             guard !Task.isCancelled else { return }
             guard self != nil else { return }
@@ -53,12 +57,41 @@ final class ResourceMonitor {
                 // Task cancellation stops the sampling loop.
             }
         }
+
+        samplingTaskHandle.set(task)
     }
 
     private func apply(_ snapshot: ResourceSnapshot) {
         cpuUsage = snapshot.cpuUsage
         gpuUsage = snapshot.gpuUsage
         memoryUsedBytes = snapshot.memoryUsedBytes
+    }
+}
+
+final class SamplingTaskHandle: @unchecked Sendable {
+    private let lock = NSLock()
+    private var task: Task<Void, Never>?
+
+    func set(_ task: Task<Void, Never>) {
+        lock.lock()
+        let previousTask = self.task
+        self.task = task
+        lock.unlock()
+
+        previousTask?.cancel()
+    }
+
+    func cancel() {
+        lock.lock()
+        let task = self.task
+        self.task = nil
+        lock.unlock()
+
+        task?.cancel()
+    }
+
+    deinit {
+        cancel()
     }
 }
 
@@ -86,9 +119,9 @@ private actor ResourceSampler {
         }
 
         return ResourceSnapshot(
-            cpuUsage: cpuUsage,
-            gpuUsage: gpuUsage,
-            memoryUsedBytes: memoryUsedBytes
+            cpuUsage: self.cpuUsage,
+            gpuUsage: self.gpuUsage,
+            memoryUsedBytes: self.memoryUsedBytes
         )
     }
 

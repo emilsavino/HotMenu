@@ -10,7 +10,7 @@ final class ThermalMonitor {
     private(set) var temperatureSource: String?
     private(set) var fanSpeed: Double?
     private(set) var hasFans: Bool = false
-    private var samplingTask: Task<Void, Never>?
+    private nonisolated let samplingTaskHandle = SamplingTaskHandle()
 
     var showTemperatureInMenuBar: Bool = UserDefaults.standard.object(forKey: "showTemperatureInMenuBar") as? Bool ?? true {
         didSet { UserDefaults.standard.set(showTemperatureInMenuBar, forKey: "showTemperatureInMenuBar") }
@@ -24,10 +24,14 @@ final class ThermalMonitor {
         startMonitoring()
     }
 
+    deinit {
+        samplingTaskHandle.cancel()
+    }
+
     private func startMonitoring() {
         let sampler = ThermalSampler()
 
-        samplingTask = Task { @MainActor [weak self, sampler] in
+        let task = Task { @MainActor [weak self, sampler] in
             while !Task.isCancelled {
                 let snapshot = await sampler.sample()
                 guard !Task.isCancelled else { return }
@@ -42,6 +46,8 @@ final class ThermalMonitor {
                 }
             }
         }
+
+        samplingTaskHandle.set(task)
     }
 
     private func apply(_ snapshot: ThermalSnapshot) {

@@ -8,14 +8,20 @@ final class StatusBarController: NSObject {
     private let resources: ResourceMonitor
     private let openAboutAction: () -> Void
     private let popover = NSPopover()
-    private let thermalStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    private let cpuStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    private let gpuStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    private let memoryStatusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let labelView = StatusBarLabelView()
     private let cpuLabelView = StatusBarMetricView(label: "CPU")
     private let gpuLabelView = StatusBarMetricView(label: "GPU")
     private let memoryLabelView = StatusBarMetricView(label: "MEM")
+    private lazy var statusBarGroupView: NSStackView = {
+        let stackView = NSStackView(views: [cpuLabelView, gpuLabelView, memoryLabelView, labelView])
+        stackView.orientation = .horizontal
+        stackView.alignment = .centerY
+        stackView.distribution = .fill
+        stackView.spacing = 0
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     private let fallbackIcon: NSImage? = {
         let image = NSImage(systemSymbolName: "flame", accessibilityDescription: "HotMenu")
         let configured = image?.withSymbolConfiguration(
@@ -41,69 +47,28 @@ final class StatusBarController: NSObject {
         self.resources = resources
         self.openAboutAction = openAboutAction
         super.init()
-        configureThermalStatusItem()
-        configureResourceStatusItem(
-            cpuStatusItem,
-            labelView: cpuLabelView,
-            accessibilityLabel: "CPU usage"
-        )
-        configureResourceStatusItem(
-            gpuStatusItem,
-            labelView: gpuLabelView,
-            accessibilityLabel: "GPU usage"
-        )
-        configureResourceStatusItem(
-            memoryStatusItem,
-            labelView: memoryLabelView,
-            accessibilityLabel: "Memory usage"
-        )
+        configureStatusItem()
         configurePopover()
         startObservingState()
         updateStatusItems()
     }
 
-    private func configureThermalStatusItem() {
-        guard let button = thermalStatusItem.button else { return }
-
-        button.title = ""
-        button.image = nil
-        button.target = self
-        button.action = #selector(togglePopover(_:))
-        configureAccessibility(for: button, label: "CPU temperature and fan speed")
-
-        labelView.translatesAutoresizingMaskIntoConstraints = false
-        button.addSubview(labelView)
-        NSLayoutConstraint.activate([
-            labelView.leadingAnchor.constraint(equalTo: button.leadingAnchor),
-            labelView.trailingAnchor.constraint(equalTo: button.trailingAnchor),
-            labelView.topAnchor.constraint(equalTo: button.topAnchor),
-            labelView.bottomAnchor.constraint(equalTo: button.bottomAnchor)
-        ])
-    }
-
-    private func configureResourceStatusItem(
-        _ statusItem: NSStatusItem,
-        labelView: StatusBarMetricView,
-        accessibilityLabel: String
-    ) {
+    private func configureStatusItem() {
         guard let button = statusItem.button else { return }
 
         button.title = ""
         button.image = nil
         button.target = self
         button.action = #selector(togglePopover(_:))
-        configureAccessibility(for: button, label: accessibilityLabel)
+        configureAccessibility(for: button, label: "HotMenu monitoring")
 
-        labelView.translatesAutoresizingMaskIntoConstraints = false
-        button.addSubview(labelView)
+        button.addSubview(statusBarGroupView)
         NSLayoutConstraint.activate([
-            labelView.leadingAnchor.constraint(equalTo: button.leadingAnchor),
-            labelView.trailingAnchor.constraint(equalTo: button.trailingAnchor),
-            labelView.topAnchor.constraint(equalTo: button.topAnchor),
-            labelView.bottomAnchor.constraint(equalTo: button.bottomAnchor)
+            statusBarGroupView.leadingAnchor.constraint(equalTo: button.leadingAnchor),
+            statusBarGroupView.trailingAnchor.constraint(equalTo: button.trailingAnchor),
+            statusBarGroupView.topAnchor.constraint(equalTo: button.topAnchor),
+            statusBarGroupView.bottomAnchor.constraint(equalTo: button.bottomAnchor)
         ])
-
-        statusItem.isVisible = false
     }
 
     private func configureAccessibility(for button: NSButton, label: String) {
@@ -148,6 +113,7 @@ final class StatusBarController: NSObject {
     private func updateStatusItems() {
         updateThermalStatusItem()
         updateResourceStatusItems()
+        updateStatusItemLayout()
         if popover.isShown {
             updatePopoverSize()
         }
@@ -162,34 +128,21 @@ final class StatusBarController: NSObject {
             fanSpeed: fanSpeed
         )
 
-        let isMenuBarContentEmpty = temperature == nil && fanSpeed == nil
-
-        if let button = thermalStatusItem.button {
-            labelView.isHidden = isMenuBarContentEmpty
-            button.image = isMenuBarContentEmpty ? fallbackIcon : nil
-            button.setAccessibilityValue(thermalAccessibilityValue)
-        }
-
-        thermalStatusItem.length = isMenuBarContentEmpty
-            ? NSStatusItem.squareLength
-            : max(labelView.intrinsicContentSize.width, 8)
+        labelView.isHidden = temperature == nil && fanSpeed == nil
     }
 
     private func updateResourceStatusItems() {
         updateResourceStatusItem(
-            cpuStatusItem,
             labelView: cpuLabelView,
             isVisible: resources.showCPUInMenuBar,
             value: percentText(resources.cpuUsage)
         )
         updateResourceStatusItem(
-            gpuStatusItem,
             labelView: gpuLabelView,
             isVisible: resources.showGPUInMenuBar,
             value: percentText(resources.gpuUsage)
         )
         updateResourceStatusItem(
-            memoryStatusItem,
             labelView: memoryLabelView,
             isVisible: resources.showMemoryInMenuBar,
             value: percentText(memoryPercent)
@@ -197,25 +150,58 @@ final class StatusBarController: NSObject {
     }
 
     private func updateResourceStatusItem(
-        _ statusItem: NSStatusItem,
         labelView: StatusBarMetricView,
         isVisible: Bool,
         value: String
     ) {
         labelView.update(value: value)
-        statusItem.button?.setAccessibilityValue(value)
-        statusItem.length = max(labelView.intrinsicContentSize.width, 8)
-        statusItem.isVisible = isVisible
+        labelView.isHidden = !isVisible
     }
 
-    private var thermalAccessibilityValue: String {
+    private func updateStatusItemLayout() {
+        let visibleViews = statusBarGroupView.arrangedSubviews.filter { !$0.isHidden }
+        let contentWidth = visibleViews.reduce(0) { width, view in
+            width + view.intrinsicContentSize.width
+        }
+        let spacing = CGFloat(max(0, visibleViews.count - 1)) * statusBarGroupView.spacing
+        let isContentEmpty = visibleViews.isEmpty
+
+        statusBarGroupView.isHidden = isContentEmpty
+        statusItem.length = isContentEmpty
+            ? NSStatusItem.squareLength
+            : max(contentWidth + spacing, 8)
+
+        if let button = statusItem.button {
+            button.image = isContentEmpty ? fallbackIcon : nil
+            button.setAccessibilityValue(monitoringAccessibilityValue)
+        }
+    }
+
+    private var monitoringAccessibilityValue: String {
         var values: [String] = []
 
-        if monitor.showTemperatureInMenuBar, let temperature = monitor.temperature {
-            values.append("\(Int(temperature.rounded())) degrees")
+        if monitor.showTemperatureInMenuBar {
+            if let temperature = monitor.temperature {
+                values.append("\(Int(temperature.rounded())) degrees")
+            } else {
+                values.append("Temperature unavailable")
+            }
         }
-        if monitor.showFanSpeedInMenuBar, let fanSpeed = monitor.fanSpeed {
-            values.append("\(Int(fanSpeed.rounded())) RPM")
+        if monitor.showFanSpeedInMenuBar {
+            if let fanSpeed = monitor.fanSpeed {
+                values.append("\(Int(fanSpeed.rounded())) RPM")
+            } else {
+                values.append("Fan speed unavailable")
+            }
+        }
+        if resources.showCPUInMenuBar {
+            values.append("CPU \(percentText(resources.cpuUsage))")
+        }
+        if resources.showGPUInMenuBar {
+            values.append("GPU \(percentText(resources.gpuUsage))")
+        }
+        if resources.showMemoryInMenuBar {
+            values.append("Memory \(percentText(memoryPercent))")
         }
 
         return values.isEmpty ? "Unavailable" : values.joined(separator: ", ")

@@ -1,7 +1,7 @@
 import AppKit
 
 final class StatusBarLabelView: NSView {
-    private static let horizontalPadding: CGFloat = 0
+    private static let horizontalPadding: CGFloat = 4
     private static let lineSpacing: CGFloat = -1
     private static let temperatureFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
     private static let fanFont = NSFont.monospacedDigitSystemFont(ofSize: 8, weight: .semibold)

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuContentView: View {
     @Bindable var monitor: ThermalMonitor
-    var resources: ResourceMonitor
+    @Bindable var resources: ResourceMonitor
     @Environment(\.openWindow) private var openWindow
     var openAboutAction: (() -> Void)?
 
@@ -35,7 +35,7 @@ struct MenuContentView: View {
                 criticalThreshold: 90
             )
             Divider()
-            SettingsSection(monitor: monitor)
+            SettingsSection(monitor: monitor, resources: resources)
             Divider()
             MenuActionsRow(openAboutAction: openAboutWindow)
         }

@@ -12,6 +12,18 @@ final class ResourceMonitor {
     private(set) var memoryUsedBytes: UInt64?
     let memoryTotalBytes: UInt64 = ProcessInfo.processInfo.physicalMemory
 
+    var showCPUInMenuBar: Bool = UserDefaults.standard.object(forKey: "showCPUInMenuBar") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(showCPUInMenuBar, forKey: "showCPUInMenuBar") }
+    }
+
+    var showGPUInMenuBar: Bool = UserDefaults.standard.object(forKey: "showGPUInMenuBar") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(showGPUInMenuBar, forKey: "showGPUInMenuBar") }
+    }
+
+    var showMemoryInMenuBar: Bool = UserDefaults.standard.object(forKey: "showMemoryInMenuBar") as? Bool ?? false {
+        didSet { UserDefaults.standard.set(showMemoryInMenuBar, forKey: "showMemoryInMenuBar") }
+    }
+
     private var timer: Timer?
     private var previousCPUTicks: CPUTicks?
 

@@ -24,41 +24,79 @@ final class ResourceMonitor {
         didSet { UserDefaults.standard.set(showMemoryInMenuBar, forKey: "showMemoryInMenuBar") }
     }
 
-    private var timer: Timer?
-    private var previousCPUTicks: CPUTicks?
+    private var samplingTask: Task<Void, Never>?
 
     init() {
         start()
     }
 
     private func start() {
-        sampleMemory()
-        sampleGPU()
-        previousCPUTicks = CPUSampler.sample()
+        let sampler = ResourceSampler()
 
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Self.cpuPrimeDelaySeconds * 1_000_000_000))
-            self?.tick()
-        }
+        samplingTask = Task { @MainActor [weak self, sampler] in
+            let initialSnapshot = await sampler.sample()
+            guard !Task.isCancelled else { return }
+            guard self != nil else { return }
+            self?.apply(initialSnapshot)
 
-        timer = Timer.scheduledTimer(withTimeInterval: Self.pollIntervalSeconds, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                self?.tick()
+            do {
+                try await Task.sleep(nanoseconds: UInt64(Self.cpuPrimeDelaySeconds * 1_000_000_000))
+
+                while !Task.isCancelled {
+                    let snapshot = await sampler.sample()
+                    guard !Task.isCancelled else { return }
+                    guard self != nil else { return }
+                    self?.apply(snapshot)
+                    try await Task.sleep(nanoseconds: UInt64(Self.pollIntervalSeconds * 1_000_000_000))
+                }
+            } catch {
+                // Task cancellation stops the sampling loop.
             }
         }
     }
 
-    private func tick() {
-        sampleCPU()
-        sampleGPU()
-        sampleMemory()
+    private func apply(_ snapshot: ResourceSnapshot) {
+        cpuUsage = snapshot.cpuUsage
+        gpuUsage = snapshot.gpuUsage
+        memoryUsedBytes = snapshot.memoryUsedBytes
+    }
+}
+
+private struct ResourceSnapshot: Sendable {
+    let cpuUsage: Double?
+    let gpuUsage: Double?
+    let memoryUsedBytes: UInt64?
+}
+
+private actor ResourceSampler {
+    private var previousCPUTicks: CPUTicks?
+    private var cpuUsage: Double?
+    private var gpuUsage: Double?
+    private var memoryUsedBytes: UInt64?
+
+    func sample() -> ResourceSnapshot {
+        if let cpuUsage = sampleCPU() {
+            self.cpuUsage = cpuUsage
+        }
+        if let gpuUsage = GPUSampler.sampleUsage() {
+            self.gpuUsage = gpuUsage
+        }
+        if let memoryUsedBytes = MemorySampler.sampleUsedBytes() {
+            self.memoryUsedBytes = memoryUsedBytes
+        }
+
+        return ResourceSnapshot(
+            cpuUsage: cpuUsage,
+            gpuUsage: gpuUsage,
+            memoryUsedBytes: memoryUsedBytes
+        )
     }
 
-    private func sampleCPU() {
-        guard let current = CPUSampler.sample() else { return }
+    private func sampleCPU() -> Double? {
+        guard let current = CPUSampler.sample() else { return nil }
         defer { previousCPUTicks = current }
 
-        guard let previous = previousCPUTicks else { return }
+        guard let previous = previousCPUTicks else { return nil }
 
         let userDelta = current.user &- previous.user
         let systemDelta = current.system &- previous.system
@@ -67,18 +105,8 @@ final class ResourceMonitor {
 
         let busy = userDelta &+ systemDelta &+ niceDelta
         let total = busy &+ idleDelta
-        guard total > 0 else { return }
+        guard total > 0 else { return nil }
 
-        cpuUsage = (Double(busy) / Double(total)) * 100.0
-    }
-
-    private func sampleMemory() {
-        guard let used = MemorySampler.sampleUsedBytes() else { return }
-        memoryUsedBytes = used
-    }
-
-    private func sampleGPU() {
-        guard let usage = GPUSampler.sampleUsage() else { return }
-        gpuUsage = usage
+        return (Double(busy) / Double(total)) * 100.0
     }
 }

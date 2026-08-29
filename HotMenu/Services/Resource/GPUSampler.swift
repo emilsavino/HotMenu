@@ -16,7 +16,7 @@ enum GPUSampler {
         guard result == KERN_SUCCESS else { return nil }
         defer { IOObjectRelease(iterator) }
 
-        var usages: [Double] = []
+        var maximumUsage: Double?
 
         while true {
             let service = IOIteratorNext(iterator)
@@ -29,13 +29,13 @@ enum GPUSampler {
                 continue
             }
 
-            usages.append(usage)
+            maximumUsage = maximumUsage.map { max($0, usage) } ?? usage
         }
 
         // A Mac can expose more than one accelerator. The menu has one GPU
         // gauge, so show the busiest accelerator instead of averaging devices
         // with potentially different capacities.
-        return usages.max()
+        return maximumUsage
     }
 
     private static func copyProperties(for service: io_registry_entry_t) -> NSDictionary? {

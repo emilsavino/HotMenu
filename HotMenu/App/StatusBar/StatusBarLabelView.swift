@@ -116,7 +116,10 @@ final class StatusBarMetricView: NSView {
         super.draw(dirtyRect)
 
         let lines = measuredLines()
-        let totalHeight = lines.reduce(0) { $0 + $1.size.height } + Self.lineSpacing
+        guard !lines.isEmpty else { return }
+
+        let totalHeight = lines.reduce(0) { $0 + $1.size.height } +
+            Self.lineSpacing * CGFloat(max(0, lines.count - 1))
         var y = max(0, round((bounds.height - totalHeight) / 2))
 
         for line in lines {

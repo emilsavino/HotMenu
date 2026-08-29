@@ -8,6 +8,7 @@ final class ResourceMonitor {
     private static let cpuPrimeDelaySeconds: TimeInterval = 0.2
 
     private(set) var cpuUsage: Double?
+    private(set) var gpuUsage: Double?
     private(set) var memoryUsedBytes: UInt64?
     let memoryTotalBytes: UInt64 = ProcessInfo.processInfo.physicalMemory
 
@@ -20,6 +21,7 @@ final class ResourceMonitor {
 
     private func start() {
         sampleMemory()
+        sampleGPU()
         previousCPUTicks = CPUSampler.sample()
 
         Task { @MainActor [weak self] in
@@ -36,6 +38,7 @@ final class ResourceMonitor {
 
     private func tick() {
         sampleCPU()
+        sampleGPU()
         sampleMemory()
     }
 
@@ -60,5 +63,10 @@ final class ResourceMonitor {
     private func sampleMemory() {
         guard let used = MemorySampler.sampleUsedBytes() else { return }
         memoryUsedBytes = used
+    }
+
+    private func sampleGPU() {
+        guard let usage = GPUSampler.sampleUsage() else { return }
+        gpuUsage = usage
     }
 }

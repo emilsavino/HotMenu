@@ -23,6 +23,7 @@
 		A1000056229E8F1100000001 /* CPUTicks.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000057229E8F1100000001 /* CPUTicks.swift */; };
 		A1000058229E8F1100000001 /* CPUSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000059229E8F1100000001 /* CPUSampler.swift */; };
 		A100005A229E8F1100000001 /* MemorySampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100005B229E8F1100000001 /* MemorySampler.swift */; };
+		A1000064229E8F1100000001 /* GPUSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000065229E8F1100000001 /* GPUSampler.swift */; };
 		A100005C229E8F1100000001 /* ThermalSummaryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100005D229E8F1100000001 /* ThermalSummaryRow.swift */; };
 		A100005E229E8F1100000001 /* ResourceRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100005F229E8F1100000001 /* ResourceRow.swift */; };
 		A1000060229E8F1100000001 /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000061229E8F1100000001 /* SettingsSection.swift */; };
@@ -49,6 +50,7 @@
 		A1000057229E8F1100000001 /* CPUTicks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUTicks.swift; sourceTree = "<group>"; };
 		A1000059229E8F1100000001 /* CPUSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPUSampler.swift; sourceTree = "<group>"; };
 		A100005B229E8F1100000001 /* MemorySampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemorySampler.swift; sourceTree = "<group>"; };
+		A1000065229E8F1100000001 /* GPUSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUSampler.swift; sourceTree = "<group>"; };
 		A100005D229E8F1100000001 /* ThermalSummaryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThermalSummaryRow.swift; sourceTree = "<group>"; };
 		A100005F229E8F1100000001 /* ResourceRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceRow.swift; sourceTree = "<group>"; };
 		A1000061229E8F1100000001 /* SettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSection.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				A1000057229E8F1100000001 /* CPUTicks.swift */,
 				A1000059229E8F1100000001 /* CPUSampler.swift */,
 				A100005B229E8F1100000001 /* MemorySampler.swift */,
+				A1000065229E8F1100000001 /* GPUSampler.swift */,
 			);
 			path = Resource;
 			sourceTree = "<group>";
@@ -243,6 +246,7 @@
 				A1000056229E8F1100000001 /* CPUTicks.swift in Sources */,
 				A1000058229E8F1100000001 /* CPUSampler.swift in Sources */,
 				A100005A229E8F1100000001 /* MemorySampler.swift in Sources */,
+				A1000064229E8F1100000001 /* GPUSampler.swift in Sources */,
 				A100005C229E8F1100000001 /* ThermalSummaryRow.swift in Sources */,
 				A100005E229E8F1100000001 /* ResourceRow.swift in Sources */,
 				A1000060229E8F1100000001 /* SettingsSection.swift in Sources */,

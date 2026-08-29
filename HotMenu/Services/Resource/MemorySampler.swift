@@ -17,10 +17,22 @@ enum MemorySampler {
         var rawPageSize: vm_size_t = 0
         guard host_page_size(mach_host_self(), &rawPageSize) == KERN_SUCCESS else { return nil }
         let pageSize = UInt64(rawPageSize)
-        let active = UInt64(stats.active_count) * pageSize
-        let wired = UInt64(stats.wire_count) * pageSize
-        let compressed = UInt64(stats.compressor_page_count) * pageSize
 
-        return active &+ wired &+ compressed
+        // Activity Monitor's "Memory Used" is not the sum of the active,
+        // wired, and compressor queues. That sum leaves out memory that is
+        // resident but not represented by those three counters. Calculate
+        // the used portion as the physical-memory complement of free and
+        // reclaimable file-backed pages instead.
+        let freePages = stats.free_count >= stats.speculative_count
+            ? UInt64(stats.free_count - stats.speculative_count)
+            : 0
+        let cachedPages = UInt64(stats.external_page_count) &+
+            UInt64(stats.purgeable_count)
+        let reclaimableBytes = (freePages &+ cachedPages) &* pageSize
+        let physicalMemory = ProcessInfo.processInfo.physicalMemory
+
+        return physicalMemory >= reclaimableBytes
+            ? physicalMemory - reclaimableBytes
+            : 0
     }
 }

@@ -15,7 +15,7 @@ struct MenuContentView: View {
                 symbolName: "cpu",
                 percent: resources.cpuUsage,
                 trailing: nil,
-                warningThreshold: 60,
+                warningThreshold: 70,
                 criticalThreshold: 85
             )
             ResourceRow(
@@ -23,7 +23,7 @@ struct MenuContentView: View {
                 symbolName: "memorychip",
                 percent: memoryPercent,
                 trailing: memoryDetail,
-                warningThreshold: 70,
+                warningThreshold: 80,
                 criticalThreshold: 90
             )
             Divider()

@@ -1,7 +1,7 @@
 import AppKit
 
 final class StatusBarLabelView: NSView {
-    private static let horizontalPadding: CGFloat = 6
+    private static let horizontalPadding: CGFloat = 0
     private static let lineSpacing: CGFloat = -1
     private static let temperatureFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
     private static let fanFont = NSFont.monospacedDigitSystemFont(ofSize: 8, weight: .semibold)
@@ -82,6 +82,9 @@ final class StatusBarMetricView: NSView {
     private static let lineSpacing: CGFloat = -1
     private static let labelFont = NSFont.monospacedSystemFont(ofSize: 8, weight: .medium)
     private static let valueFont = NSFont.monospacedDigitSystemFont(ofSize: 10, weight: .semibold)
+    private static let maximumValueWidth: CGFloat = ["100%", "—%"]
+        .map { NSAttributedString(string: $0, attributes: [.font: valueFont]).size().width }
+        .max() ?? 0
 
     private let label: String
     private var value = "—%"
@@ -98,10 +101,12 @@ final class StatusBarMetricView: NSView {
     }
 
     override var intrinsicContentSize: NSSize {
-        let measured = measuredLines()
-        let width = measured.map(\.size.width).max() ?? 0
+        let labelWidth = NSAttributedString(
+            string: label,
+            attributes: [.font: Self.labelFont]
+        ).size().width
         return NSSize(
-            width: width + Self.horizontalPadding * 2,
+            width: max(labelWidth, Self.maximumValueWidth) + Self.horizontalPadding * 2,
             height: NSStatusBar.system.thickness
         )
     }

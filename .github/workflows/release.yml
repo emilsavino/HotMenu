@@ -152,7 +152,11 @@ jobs:
           git -C "$APPCAST_WORKTREE" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C "$APPCAST_WORKTREE" add appcast.xml
           git -C "$APPCAST_WORKTREE" commit -m "chore: publish appcast for ${TAG}"
-          git -C "$APPCAST_WORKTREE" push "${PUSH_ARGS[@]}" origin "$APPCAST_BRANCH"
+          if [ "${#PUSH_ARGS[@]}" -gt 0 ]; then
+            git -C "$APPCAST_WORKTREE" push --force-with-lease origin "$APPCAST_BRANCH"
+          else
+            git -C "$APPCAST_WORKTREE" push origin "$APPCAST_BRANCH"
+          fi
 
           PR_NUMBER="$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \

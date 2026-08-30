@@ -18,5 +18,17 @@
                 length="3865684"
                 type="application/octet-stream" />
         </item>
+        <item>
+            <title>HotMenu 0.4.4</title>
+            <link>https://github.com/emilsavino/HotMenu/releases/tag/v0.4.4</link>
+            <sparkle:version>044</sparkle:version>
+            <sparkle:shortVersionString>0.4.4</sparkle:shortVersionString>
+            <pubDate>Sun, 30 Aug 2026 08:10:24 +0000</pubDate>
+            <enclosure
+                url="https://github.com/emilsavino/HotMenu/releases/download/v0.4.4/HotMenu-0.4.4.zip"
+                sparkle:edSignature="3+1UQmO4KAFd4fcBnwWX7oWphsr91A2Y8+7X6IGGmWCX8S5VZJFAicfdJ3f1/5n+JBe8WegSwFSJalQexamvCA=="
+                length="3865674"
+                type="application/octet-stream" />
+        </item>
     </channel>
 </rss>

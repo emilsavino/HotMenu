@@ -3,9 +3,16 @@ name: Release
 on:
   push:
     tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and publish
+        required: true
+        type: string
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
@@ -13,11 +20,15 @@ jobs:
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Derive version from tag
         id: version
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          TAG="$RELEASE_TAG"
           VERSION="${TAG#v}"
           BASE_VERSION="${VERSION%%-*}"
           BUILD_NUMBER="$(printf '%s' "$BASE_VERSION" | tr -d '.')"
@@ -101,7 +112,7 @@ jobs:
             gh release upload "$TAG" release/* --clobber
           fi
 
-      - name: Publish appcast to main
+      - name: Publish appcast through a pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SIGNATURE: ${{ steps.sign.outputs.signature }}
@@ -113,11 +124,21 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           BUILD_NUMBER="${{ steps.version.outputs.build_number }}"
           DOWNLOAD_URL="https://github.com/emilsavino/HotMenu/releases/download/${TAG}/HotMenu-${VERSION}.zip"
+          APPCAST_BRANCH="automation/appcast/${TAG}"
           APPCAST_WORKTREE="$RUNNER_TEMP/hotmenu-appcast"
 
           git fetch origin main
           git worktree add --detach "$APPCAST_WORKTREE" origin/main
           trap 'git worktree remove --force "$APPCAST_WORKTREE"' EXIT
+
+          PUSH_ARGS=()
+          if git ls-remote --exit-code --heads origin "$APPCAST_BRANCH" >/dev/null 2>&1; then
+            git -C "$APPCAST_WORKTREE" fetch origin \
+              "refs/heads/${APPCAST_BRANCH}:refs/remotes/origin/${APPCAST_BRANCH}"
+            PUSH_ARGS+=(--force-with-lease)
+          fi
+
+          git -C "$APPCAST_WORKTREE" switch -C "$APPCAST_BRANCH" origin/main
 
           "$GITHUB_WORKSPACE/scripts/update-appcast.sh" \
             "$VERSION" \
@@ -131,4 +152,28 @@ jobs:
           git -C "$APPCAST_WORKTREE" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C "$APPCAST_WORKTREE" add appcast.xml
           git -C "$APPCAST_WORKTREE" commit -m "chore: publish appcast for ${TAG}"
-          git -C "$APPCAST_WORKTREE" push origin HEAD:main
+          git -C "$APPCAST_WORKTREE" push "${PUSH_ARGS[@]}" origin "$APPCAST_BRANCH"
+
+          PR_NUMBER="$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head "$APPCAST_BRANCH" \
+            --state open \
+            --json number \
+            --jq '.[0].number')"
+          PR_TITLE="chore: publish appcast for ${TAG}"
+          PR_BODY="Automated Sparkle appcast update for release ${TAG}."
+
+          if [ -n "$PR_NUMBER" ]; then
+            gh pr edit "$PR_NUMBER" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+          else
+            gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$APPCAST_BRANCH" \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY"
+          fi

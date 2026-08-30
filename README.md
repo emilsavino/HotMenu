@@ -35,9 +35,11 @@ cd "$(dirname "$GENERATE_KEYS")"
 
 Copy the public key printed by `generate_keys` into `SUPublicEDKey` in `HotMenu/Info.plist`. Store the full contents of `sparkle_private_key.txt` as the GitHub Actions secret `SPARKLE_PRIVATE_KEY`, then delete the exported file if it is no longer needed. Never commit the private key.
 
-Push a `v*.*.*` tag to trigger the release workflow, which bumps the app version from the tag, builds and signs the update ZIP, attaches the `.zip` and `.dmg` to a GitHub release, and commits the new appcast item to `main`:
+Push a `v*.*.*` tag to trigger the release workflow, which bumps the app version from the tag, builds and signs the update ZIP, attaches the `.zip` and `.dmg` to a GitHub release, and opens a pull request containing the new appcast item for `main`. Merge that pull request to publish the update feed:
 
 ```sh
 git tag v0.2.0
 git push origin v0.2.0
 ```
+
+The same workflow can be run manually from GitHub Actions by entering an existing release tag, which is useful for retrying a failed appcast publication.

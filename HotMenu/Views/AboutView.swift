@@ -33,7 +33,7 @@ struct AboutView: View {
     }
 
     private var description: some View {
-        Text("Monitor your Mac's temperature and fan activity.")
+        Text("System monitoring for your Mac.")
             .font(.body)
             .multilineTextAlignment(.center)
             .foregroundStyle(.secondary)

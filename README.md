@@ -6,7 +6,7 @@ Forked from [angristan/MacThrottle](https://github.com/angristan/MacThrottle) (M
 
 ## Install
 
-Releases ship as unsigned `.zip` and `.dmg` artifacts, so macOS will quarantine the app on first launch. To install:
+Releases ship as ad-hoc signed `.zip` and `.dmg` artifacts. They are not notarized, so macOS may quarantine the app on first launch. To install:
 
 1. Drag `HotMenu.app` from the DMG (or extracted ZIP) into `/Applications`.
 2. Remove the quarantine attribute so Gatekeeper lets it run:
@@ -35,7 +35,7 @@ cd "$(dirname "$GENERATE_KEYS")"
 
 Copy the public key printed by `generate_keys` into `SUPublicEDKey` in `HotMenu/Info.plist`. Store the full contents of `sparkle_private_key.txt` as the GitHub Actions secret `SPARKLE_PRIVATE_KEY`, then delete the exported file if it is no longer needed. Never commit the private key.
 
-Push a `v*.*.*` tag to trigger the release workflow, which bumps the app version from the tag, builds and signs the update ZIP, attaches the `.zip` and `.dmg` to a GitHub release, and opens a pull request containing the new appcast item for `main`. Merge that pull request to publish the update feed:
+Push a `v*.*.*` tag to trigger the release workflow, which bumps the app version from the tag, fully ad-hoc signs the app bundle, signs the update ZIP, attaches the `.zip` and `.dmg` to a GitHub release, and opens a pull request containing the new appcast item for `main`. Merge that pull request to publish the update feed. For releases that should pass Gatekeeper and notarization, set `HOTMENU_SIGNING_IDENTITY` to a `Developer ID Application` certificate identity before running `scripts/build-release.sh`.
 
 ```sh
 git tag v0.2.0

@@ -5,6 +5,7 @@ struct MenuContentView: View {
     @Bindable var resources: ResourceMonitor
     @Environment(\.openWindow) private var openWindow
     var openAboutAction: (() -> Void)?
+    let checkForUpdatesAction: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -37,7 +38,10 @@ struct MenuContentView: View {
             Divider()
             SettingsSection(monitor: monitor, resources: resources)
             Divider()
-            MenuActionsRow(openAboutAction: openAboutWindow)
+            MenuActionsRow(
+                openAboutAction: openAboutWindow,
+                checkForUpdatesAction: checkForUpdatesAction
+            )
         }
         .padding(12)
         .frame(width: 260)

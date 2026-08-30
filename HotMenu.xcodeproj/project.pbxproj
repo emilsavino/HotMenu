@@ -28,6 +28,7 @@
 		A100005E229E8F1100000001 /* ResourceRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A100005F229E8F1100000001 /* ResourceRow.swift */; };
 		A1000060229E8F1100000001 /* SettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000061229E8F1100000001 /* SettingsSection.swift */; };
 		A1000062229E8F1100000001 /* MenuActionsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000063229E8F1100000001 /* MenuActionsRow.swift */; };
+		A1000080229E8F1100000001 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A1000081229E8F1100000001 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000080229E8F1100000001 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +179,9 @@
 			);
 			dependencies = (
 			);
+			packageProductDependencies = (
+				A1000081229E8F1100000001 /* Sparkle */,
+			);
 			name = HotMenu;
 			productName = HotMenu;
 			productReference = A1000005229E8F1100000001 /* HotMenu.app */;
@@ -206,6 +211,9 @@
 				Base,
 			);
 			mainGroup = A1000008229E8F1100000001;
+			packageReferences = (
+				A1000082229E8F1100000001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			productRefGroup = A100000A229E8F1100000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -457,6 +465,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+		A1000081229E8F1100000001 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000082229E8F1100000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		A1000082229E8F1100000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.6;
+			};
+		};
 	};
 	rootObject = A100000F229E8F1100000001 /* Project object */;
 }

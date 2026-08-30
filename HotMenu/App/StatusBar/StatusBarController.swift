@@ -7,6 +7,7 @@ final class StatusBarController: NSObject {
     private let monitor: ThermalMonitor
     private let resources: ResourceMonitor
     private let openAboutAction: () -> Void
+    private let checkForUpdatesAction: () -> Void
     private let popover = NSPopover()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let labelView = StatusBarLabelView()
@@ -38,14 +39,24 @@ final class StatusBarController: NSObject {
             openAboutAction: { [weak self] in
                 self?.popover.performClose(nil)
                 self?.openAboutAction()
+            },
+            checkForUpdatesAction: { [weak self] in
+                self?.popover.performClose(nil)
+                self?.checkForUpdatesAction()
             }
         )
     )
 
-    init(monitor: ThermalMonitor, resources: ResourceMonitor, openAboutAction: @escaping () -> Void) {
+    init(
+        monitor: ThermalMonitor,
+        resources: ResourceMonitor,
+        openAboutAction: @escaping () -> Void,
+        checkForUpdatesAction: @escaping () -> Void
+    ) {
         self.monitor = monitor
         self.resources = resources
         self.openAboutAction = openAboutAction
+        self.checkForUpdatesAction = checkForUpdatesAction
         super.init()
         configureStatusItem()
         configurePopover()

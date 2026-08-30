@@ -2,13 +2,24 @@ import SwiftUI
 
 struct MenuActionsRow: View {
     let openAboutAction: () -> Void
+    let checkForUpdatesAction: () -> Void
 
     var body: some View {
-        HStack {
-            aboutButton
-            Spacer()
-            quitButton
+        VStack(alignment: .leading, spacing: 6) {
+            checkForUpdatesButton
+            HStack {
+                aboutButton
+                Spacer()
+                quitButton
+            }
         }
+    }
+
+    private var checkForUpdatesButton: some View {
+        Button("Check for Updates…") {
+            checkForUpdatesAction()
+        }
+        .controlSize(.small)
     }
 
     private var aboutButton: some View {

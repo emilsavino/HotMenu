@@ -2,7 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>LSUIElement</key>
-    <true/>
+	<key>LSUIElement</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/emilsavino/HotMenu/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>5RX6sV4qAh7Sff9L7HuB5k58ZCNutyuXqgLLHnmIxXo=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 </dict>
 </plist>

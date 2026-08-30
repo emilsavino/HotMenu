@@ -8,6 +8,9 @@ build/
 release/
 .build/
 
+# Sparkle signing key export
+sparkle_private_key.txt
+
 # macOS
 .DS_Store
 

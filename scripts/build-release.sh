@@ -32,7 +32,7 @@ fi
 
 # Create ZIP
 echo "Creating ZIP archive..."
-ditto -c -k --keepParent "$APP_PATH" "release/HotMenu-${VERSION}.zip"
+ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "release/HotMenu-${VERSION}.zip"
 
 # Create DMG using create-dmg
 echo "Creating DMG..."

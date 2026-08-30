@@ -24,7 +24,18 @@ open .build/Build/Products/Debug/HotMenu.app
 
 ## Release
 
-Push a `v*.*.*` tag to trigger the release workflow, which builds an unsigned `.zip` and `.dmg` and attaches them to a GitHub release with auto-generated notes:
+Sparkle update metadata is published to [`appcast.xml`](appcast.xml). Set up its signing key once on a Mac after Xcode has resolved the Sparkle package:
+
+```sh
+GENERATE_KEYS="$(find ~/Library/Developer/Xcode/DerivedData -path '*artifacts/sparkle*/bin/generate_keys' -print -quit)"
+cd "$(dirname "$GENERATE_KEYS")"
+./generate_keys
+./generate_keys -x sparkle_private_key.txt
+```
+
+Copy the public key printed by `generate_keys` into `SUPublicEDKey` in `HotMenu/Info.plist`. Store the full contents of `sparkle_private_key.txt` as the GitHub Actions secret `SPARKLE_PRIVATE_KEY`, then delete the exported file if it is no longer needed. Never commit the private key.
+
+Push a `v*.*.*` tag to trigger the release workflow, which bumps the app version from the tag, builds and signs the update ZIP, attaches the `.zip` and `.dmg` to a GitHub release, and commits the new appcast item to `main`:
 
 ```sh
 git tag v0.2.0

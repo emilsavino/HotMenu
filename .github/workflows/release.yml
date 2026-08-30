@@ -19,8 +19,19 @@ jobs:
         run: |
           TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
+          BASE_VERSION="${VERSION%%-*}"
+          BUILD_NUMBER="$(printf '%s' "$BASE_VERSION" | tr -d '.')"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Tag must contain a semantic version: $TAG" >&2
+            exit 1
+          fi
+          if [[ ! "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Could not derive a numeric build number from: $TAG" >&2
+            exit 1
+          fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
           if [[ "$TAG" == *-* ]]; then
             echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT"
           else
@@ -33,8 +44,52 @@ jobs:
       - name: Set app version
         run: ./scripts/set-version.sh "${{ steps.version.outputs.version }}"
 
+      - name: Validate Sparkle configuration
+        run: |
+          if grep -q '<string>YOUR_PUBLIC_KEY</string>' HotMenu/Info.plist; then
+            echo "Replace YOUR_PUBLIC_KEY in HotMenu/Info.plist before publishing a release." >&2
+            exit 1
+          fi
+
       - name: Build release artifacts
         run: ./scripts/build-release.sh "${{ steps.version.outputs.version }}"
+
+      - name: Sign Sparkle update
+        id: sign
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          if [ -z "${SPARKLE_PRIVATE_KEY:-}" ]; then
+            echo "The SPARKLE_PRIVATE_KEY GitHub secret is not set." >&2
+            exit 1
+          fi
+
+          SIGN_UPDATE="$(find "$GITHUB_WORKSPACE/build" "$HOME/Library/Developer/Xcode/DerivedData" \
+            -type f -path '*/artifacts/sparkle*/bin/sign_update' -print -quit 2>/dev/null)"
+          if [ -z "$SIGN_UPDATE" ]; then
+            echo "Could not find Sparkle's sign_update tool." >&2
+            exit 1
+          fi
+
+          ZIP_PATH="release/HotMenu-${{ steps.version.outputs.version }}.zip"
+          SIGNATURE_OUTPUT="$("$SIGN_UPDATE" "$ZIP_PATH" -f - <<< "$SPARKLE_PRIVATE_KEY")"
+          SIGNATURE="$(printf '%s\n' "$SIGNATURE_OUTPUT" | sed -nE 's/.*sparkle:edSignature="([^"]+)".*/\1/p' | head -n 1)"
+          FILE_SIZE="$(printf '%s\n' "$SIGNATURE_OUTPUT" | sed -nE 's/.*length="([0-9]+)".*/\1/p' | head -n 1)"
+
+          if [ -z "$SIGNATURE" ] || [ -z "$FILE_SIZE" ]; then
+            echo "Sparkle sign_update returned an unexpected result:" >&2
+            printf '%s\n' "$SIGNATURE_OUTPUT" >&2
+            exit 1
+          fi
+
+          ACTUAL_FILE_SIZE="$(wc -c < "$ZIP_PATH" | tr -d '[:space:]')"
+          if [ "$FILE_SIZE" != "$ACTUAL_FILE_SIZE" ]; then
+            echo "Sparkle reported $FILE_SIZE bytes, but the archive is $ACTUAL_FILE_SIZE bytes." >&2
+            exit 1
+          fi
+
+          echo "signature=$SIGNATURE" >> "$GITHUB_OUTPUT"
+          echo "file_size=$FILE_SIZE" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
         env:
@@ -45,3 +100,35 @@ jobs:
           if ! gh release create "$TAG" --generate-notes $PRERELEASE release/*; then
             gh release upload "$TAG" release/* --clobber
           fi
+
+      - name: Publish appcast to main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SIGNATURE: ${{ steps.sign.outputs.signature }}
+          FILE_SIZE: ${{ steps.sign.outputs.file_size }}
+        run: |
+          set -euo pipefail
+
+          TAG="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.version }}"
+          BUILD_NUMBER="${{ steps.version.outputs.build_number }}"
+          DOWNLOAD_URL="https://github.com/emilsavino/HotMenu/releases/download/${TAG}/HotMenu-${VERSION}.zip"
+          APPCAST_WORKTREE="$RUNNER_TEMP/hotmenu-appcast"
+
+          git fetch origin main
+          git worktree add --detach "$APPCAST_WORKTREE" origin/main
+          trap 'git worktree remove --force "$APPCAST_WORKTREE"' EXIT
+
+          "$GITHUB_WORKSPACE/scripts/update-appcast.sh" \
+            "$VERSION" \
+            "$BUILD_NUMBER" \
+            "$DOWNLOAD_URL" \
+            "$SIGNATURE" \
+            "$FILE_SIZE" \
+            "$APPCAST_WORKTREE/appcast.xml"
+
+          git -C "$APPCAST_WORKTREE" config user.name "github-actions[bot]"
+          git -C "$APPCAST_WORKTREE" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$APPCAST_WORKTREE" add appcast.xml
+          git -C "$APPCAST_WORKTREE" commit -m "chore: publish appcast for ${TAG}"
+          git -C "$APPCAST_WORKTREE" push origin HEAD:main
